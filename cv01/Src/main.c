@@ -41,6 +41,7 @@ int main(void)
 			{
 				GPIOA->BRR = (1<<5);
 			}
+			pole = pole << 1;
 			for (volatile uint32_t j = 0; j < 50000; j++) {}
 		}
 	}
