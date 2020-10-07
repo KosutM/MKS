@@ -23,10 +23,11 @@
 #endif
 
 static volatile uint32_t Tick;
-#define LED_TIME_BLINK 	300
-#define BUTTON_DEBOUNCE 40
-#define LED_TIME_SHORT 	100
-#define LED_TIME_LONG	1000
+#define LED_TIME_BLINK 			300
+#define BUTTON_DEBOUNCE 		40
+#define BUTTON_DEBOUNCE_SHORT	5
+#define LED_TIME_SHORT 			100
+#define LED_TIME_LONG			1000
 
 void EXTI0_1_IRQHandler(void)
 {
@@ -55,6 +56,7 @@ void blikac(void)
 void tlacitka(void)
 {
 	static uint32_t debounce1;
+	static uint32_t debounce2;
 	static uint32_t off_time;
 
 	if (Tick > debounce1 + BUTTON_DEBOUNCE)
@@ -77,6 +79,21 @@ void tlacitka(void)
 		old_s2 = new_s2;
 	}
 
+	if (Tick > debounce2 + BUTTON_DEBOUNCE_SHORT)	//shift register debounce, 5ms sampling
+	{
+		static uint16_t debounce = 0xFFFF;
+
+		debounce <<= 1;								//shift register to left
+		if (GPIOC->IDR & (1<<1))					//if s1 released
+		{
+			debounce |= 0x0001;
+		}
+		if (debounce == 0x8000)						//turn on LED2
+		{
+			off_time = Tick + LED_TIME_LONG;
+			GPIOB->BSRR = (1<<0);
+		}
+	}
 	if (Tick > off_time)							//if tick value pass off time value turn off LED2
 	{
 		GPIOB->BRR = (1<<0);
@@ -94,13 +111,14 @@ int main(void)
 
 	SysTick_Config(8000); //1ms
 
-	/*SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PC; // select PC0 for EXTI0
-	EXTI->IMR |= EXTI_IMR_MR0; // mask
-	EXTI->FTSR |= EXTI_FTSR_TR0; // trigger on falling edge
-	NVIC_EnableIRQ(EXTI0_1_IRQn); // enable EXTI0_1
+	/*SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PC; 	// select PC0 for EXTI0
+	EXTI->IMR |= EXTI_IMR_MR0; 							// mask
+	EXTI->FTSR |= EXTI_FTSR_TR0; 						// trigger on falling edge
+	NVIC_EnableIRQ(EXTI0_1_IRQn); 						// enable EXTI0_1
 */
 	for(;;)
 	{
 		blikac();
+		tlacitka();
 	}
 }
