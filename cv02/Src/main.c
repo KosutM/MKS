@@ -22,6 +22,12 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+static volatile uint32_t Tick;
+#define LED_TIME_BLINK 	300
+#define BUTTON_DEBOUNCE 40
+#define LED_TIME_SHORT 	100
+#define LED_TIME_LONG	1000
+
 void EXTI0_1_IRQHandler(void)
 {
 	if (EXTI->PR & EXTI_PR_PR0)
@@ -31,6 +37,51 @@ void EXTI0_1_IRQHandler(void)
 	}
 }
 
+void SysTick_Handler(void)
+{
+	Tick++;
+}
+
+void blikac(void)
+{
+	static uint32_t delay;
+
+	if (Tick > delay + LED_TIME_BLINK)
+	{
+		GPIOA->ODR ^= (1<<4);
+	}
+}
+
+void tlacitka(void)
+{
+	static uint32_t debounce1;
+	static uint32_t off_time;
+
+	if (Tick > debounce1 + BUTTON_DEBOUNCE)
+	{
+		static uint32_t old_s1, old_s2;
+		uint32_t new_s1 = GPIOC->IDR & (1<<1);		//get S1 value
+		uint32_t new_s2 = GPIOC->IDR & (1<<0);		//get S2 value
+
+		if (old_s1 && !new_s1) 						//falling edge s1
+		{
+			off_time = Tick + LED_TIME_LONG;
+			GPIOB->BSRR = (1<<0);					//turn on LED2
+		}
+		if (old_s2 && !new_s2)
+		{ 											// falling edge s2
+			off_time = Tick + LED_TIME_SHORT;
+			GPIOB->BSRR = (1<<0);					//turn on LED2
+		}
+		old_s1 = new_s1;
+		old_s2 = new_s2;
+	}
+
+	if (Tick > off_time)							//if tick value pass off time value turn off LED2
+	{
+		GPIOB->BRR = (1<<0);
+	}
+}
 int main(void)
 {
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN | RCC_AHBENR_GPIOCEN; // enable
@@ -40,13 +91,16 @@ int main(void)
 	GPIOC->PUPDR |= GPIO_PUPDR_PUPDR1_0; // S1 = PC1, pullup
 
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-	SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PC; // select PC0 for EXTI0
+
+	SysTick_Config(8000); //1ms
+
+	/*SYSCFG->EXTICR[0] |= SYSCFG_EXTICR1_EXTI0_PC; // select PC0 for EXTI0
 	EXTI->IMR |= EXTI_IMR_MR0; // mask
 	EXTI->FTSR |= EXTI_FTSR_TR0; // trigger on falling edge
 	NVIC_EnableIRQ(EXTI0_1_IRQn); // enable EXTI0_1
-
+*/
 	for(;;)
 	{
-
+		blikac();
 	}
 }
