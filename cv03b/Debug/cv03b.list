@@ -280,11 +280,11 @@ int main(void)
  8000252:	009b      	lsls	r3, r3, #2
  8000254:	0018      	movs	r0, r3
  8000256:	f000 fb2d 	bl	80008b4 <HAL_Delay>
-  while (1)
-  {
-    /* USER CODE END WHILE */
+	  {
+		  sct_value(i);
+		  HAL_Delay(1000);
+	  }*/
 
-    /* USER CODE BEGIN 3 */
 	  sct_value(__HAL_TIM_GET_COUNTER(&htim1));		//show value of encoder on display
  800025a:	4b05      	ldr	r3, [pc, #20]	; (8000270 <main+0x50>)
  800025c:	681b      	ldr	r3, [r3, #0]

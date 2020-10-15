@@ -104,13 +104,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  /*for (uint16_t i = 0; i < 1000; i += 111)	//count from 0 to 999
-	  {
-		  sct_value(i);
-		  HAL_Delay(1000);
-	  }*/
-
 	  sct_value(__HAL_TIM_GET_COUNTER(&htim1));		//show value of encoder on display
 	  HAL_Delay(50);
 
