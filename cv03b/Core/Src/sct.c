@@ -18,13 +18,13 @@ void sct_led(uint32_t value)
 		HAL_GPIO_WritePin(SCT_CLK_GPIO_Port, SCT_CLK_Pin, 1);	//clock pulse
 		HAL_GPIO_WritePin(SCT_CLK_GPIO_Port, SCT_CLK_Pin, 0);
 	}
-	HAL_GPIO_WritePin(SCT_NLA_GPIO_Port, SCT_NLA_Pin, 1);	//latch pulse
+	HAL_GPIO_WritePin(SCT_NLA_GPIO_Port, SCT_NLA_Pin, 1);		//latch pulse
 	HAL_GPIO_WritePin(SCT_NLA_GPIO_Port, SCT_NLA_Pin, 0);
 }
 
 void sct_init(void)
 {
-	HAL_GPIO_WritePin(SCT_NLA_GPIO_Port, SCT_NLA_Pin, 0);	//output enable
+	HAL_GPIO_WritePin(SCT_NLA_GPIO_Port, SCT_NLA_Pin, 0);		//output enable
 	sct_led(0);
 }
 
@@ -77,7 +77,7 @@ void sct_value(uint16_t value)
 	reg |= reg_values[1][value / 10 % 10];		//tens
 	reg |= reg_values[2][value / 1 % 10];		//ones
 
-	sct_led(reg);
+	sct_led(reg);								//send data to display
 }
 
 
