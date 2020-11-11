@@ -1,0 +1,11 @@
+1wire.c:17:6:OWInit	8	static
+1wire.c:25:9:OWReset	24	static,ignoring_inline_asm
+1wire.c:41:6:OWWriteBit	32	static,ignoring_inline_asm
+1wire.c:61:9:OWReadBit	24	static,ignoring_inline_asm
+1wire.c:76:6:OWWriteByte	24	static
+1wire.c:87:9:OWReadByte	16	static
+1wire.c:100:6:OWSendCmd	32	static
+1wire.c:118:6:OWCRC	24	static
+1wire.c:136:9:OWReadRom	32	static
+1wire.c:156:6:OWConvertAll	8	static
+1wire.c:161:9:OWReadTemperature	40	static
